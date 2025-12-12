@@ -1,0 +1,2 @@
+UPDATE usuarios SET password_hash = '$2a$10$J21bWb9LHe4biH72lSPKIO/c0GL13Bzca4zut8/VJygYUIRDqkW36' WHERE username = 'admin';
+UPDATE usuarios SET password_hash = '$2a$10$eRhA7OMFELE0ZC0rDUH7TuyFZc8Zk06b6F3QbauLmXSdaXIcC4PFO' WHERE username = 'usuario';
