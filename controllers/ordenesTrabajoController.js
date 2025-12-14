@@ -117,15 +117,42 @@ const createOrdenTrabajo = async (req, res) => {
 
             if (detallesError) throw detallesError;
 
-            // Reducir stock automáticamente
+            // 🔥 REDUCIR STOCK DIRECTAMENTE EN EL BACKEND
+            console.log('📦 Reduciendo stock para orden de trabajo...');
             for (const detalle of detalles) {
                 if (detalle.inventario_id && detalle.cantidad > 0) {
-                    const { error: stockError } = await supabase.rpc('reducir_stock', {
-                        item_id: detalle.inventario_id,
-                        cantidad: detalle.cantidad
-                    });
+                    console.log(`  → Producto ${detalle.inventario_id}: -${detalle.cantidad} unidades`);
 
-                    if (stockError) console.error('Error al reducir stock:', stockError);
+                    // Obtener stock actual
+                    const { data: productoActual, error: fetchError } = await supabase
+                        .from('inventario')
+                        .select('stock_actual')
+                        .eq('id', detalle.inventario_id)
+                        .single();
+
+                    if (fetchError) {
+                        console.error('❌ Error al obtener producto:', fetchError);
+                        continue;
+                    }
+
+                    if (productoActual) {
+                        const nuevoStock = productoActual.stock_actual - parseInt(detalle.cantidad);
+
+                        // Actualizar stock
+                        const { error: stockError } = await supabase
+                            .from('inventario')
+                            .update({
+                                stock_actual: nuevoStock,
+                                updated_at: new Date().toISOString()
+                            })
+                            .eq('id', detalle.inventario_id);
+
+                        if (stockError) {
+                            console.error('❌ Error al reducir stock:', stockError);
+                        } else {
+                            console.log(`  ✅ Stock reducido: ${productoActual.stock_actual} → ${nuevoStock}`);
+                        }
+                    }
                 }
             }
 
@@ -134,6 +161,7 @@ const createOrdenTrabajo = async (req, res) => {
 
         // Invalidar caché
         invalidateCache('ordenes_trabajo');
+        invalidateCache('inventario');
 
         res.status(201).json({
             success: true,

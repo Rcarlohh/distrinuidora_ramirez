@@ -41,7 +41,7 @@ const OrdenesTrabajo = () => {
     });
 
     const [detalles, setDetalles] = useState([
-        { cantidad: 1, material_concepto: '' }
+        { cantidad: 1, material_concepto: '', precio_unitario: 0 }
     ]);
 
     useEffect(() => {
@@ -91,7 +91,7 @@ const OrdenesTrabajo = () => {
     };
 
     const addDetalle = () => {
-        setDetalles([...detalles, { cantidad: 1, material_concepto: '' }]);
+        setDetalles([...detalles, { cantidad: 1, material_concepto: '', precio_unitario: 0 }]);
     };
 
     const removeDetalle = (index) => {
@@ -130,7 +130,7 @@ const OrdenesTrabajo = () => {
             observaciones: '',
             estado: 'Pendiente'
         });
-        setDetalles([{ cantidad: 1, material_concepto: '' }]);
+        setDetalles([{ cantidad: 1, material_concepto: '', precio_unitario: 0 }]);
     };
 
     const filteredOrdenes = filtroEstado
@@ -362,14 +362,15 @@ const OrdenesTrabajo = () => {
 
                                 {/* Materiales/Servicios */}
                                 <div className="detalles-section">
-                                    <h3>Materiales / Servicios</h3>
+                                    <h3>🛒 Materiales / Servicios</h3>
 
                                     <InventarioSelector
                                         onSelect={(item) => {
                                             setDetalles([...detalles, {
                                                 cantidad: 1,
-                                                material_concepto: item.nombre,
-                                                inventario_id: item.id
+                                                material_concepto: item.material_servicio,
+                                                precio_unitario: item.precio_unitario,
+                                                inventario_id: item.inventario_id
                                             }]);
                                         }}
                                     />
@@ -384,7 +385,7 @@ const OrdenesTrabajo = () => {
                                         <div key={index} className="detalle-row">
                                             <input
                                                 type="number"
-                                                placeholder="Cantidad"
+                                                placeholder="Cant."
                                                 min="1"
                                                 value={detalle.cantidad}
                                                 onChange={(e) => updateDetalle(index, 'cantidad', parseInt(e.target.value) || 0)}
@@ -396,6 +397,17 @@ const OrdenesTrabajo = () => {
                                                 onChange={(e) => updateDetalle(index, 'material_concepto', e.target.value)}
                                                 style={{ flex: 2 }}
                                             />
+                                            <input
+                                                type="number"
+                                                placeholder="Precio"
+                                                step="0.01"
+                                                min="0"
+                                                value={detalle.precio_unitario || 0}
+                                                onChange={(e) => updateDetalle(index, 'precio_unitario', parseFloat(e.target.value) || 0)}
+                                            />
+                                            <span className="detalle-total">
+                                                ${((detalle.cantidad || 0) * (detalle.precio_unitario || 0)).toFixed(2)}
+                                            </span>
                                             {detalles.length > 1 && (
                                                 <button
                                                     type="button"
@@ -407,6 +419,22 @@ const OrdenesTrabajo = () => {
                                             )}
                                         </div>
                                     ))}
+
+                                    {/* Total General */}
+                                    <div style={{ marginTop: '20px', padding: '15px', backgroundColor: '#f8f9fa', borderRadius: '8px' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                                            <strong>Subtotal:</strong>
+                                            <span>${detalles.reduce((sum, d) => sum + ((d.cantidad || 0) * (d.precio_unitario || 0)), 0).toFixed(2)}</span>
+                                        </div>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                                            <strong>IVA (16%):</strong>
+                                            <span>${(detalles.reduce((sum, d) => sum + ((d.cantidad || 0) * (d.precio_unitario || 0)), 0) * 0.16).toFixed(2)}</span>
+                                        </div>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '18px', borderTop: '2px solid #dee2e6', paddingTop: '8px' }}>
+                                            <strong>Total:</strong>
+                                            <strong style={{ color: '#2c3e50' }}>${(detalles.reduce((sum, d) => sum + ((d.cantidad || 0) * (d.precio_unitario || 0)), 0) * 1.16).toFixed(2)}</strong>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 {/* Personal */}

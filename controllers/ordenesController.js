@@ -124,8 +124,48 @@ const createOrden = async (req, res) => {
 
         if (detallesError) throw detallesError;
 
+        // 🔥 REDUCIR STOCK DIRECTAMENTE EN EL BACKEND
+        console.log('📦 Reduciendo stock para', detalles.length, 'productos...');
+        for (const detalle of detalles) {
+            if (detalle.inventario_id && detalle.cantidad > 0) {
+                console.log(`  → Producto ${detalle.inventario_id}: -${detalle.cantidad} unidades`);
+
+                // Obtener stock actual
+                const { data: productoActual, error: fetchError } = await supabase
+                    .from('inventario')
+                    .select('stock_actual')
+                    .eq('id', detalle.inventario_id)
+                    .single();
+
+                if (fetchError) {
+                    console.error('❌ Error al obtener producto:', fetchError);
+                    continue;
+                }
+
+                if (productoActual) {
+                    const nuevoStock = productoActual.stock_actual - parseInt(detalle.cantidad);
+
+                    // Actualizar stock
+                    const { error: stockError } = await supabase
+                        .from('inventario')
+                        .update({
+                            stock_actual: nuevoStock,
+                            updated_at: new Date().toISOString()
+                        })
+                        .eq('id', detalle.inventario_id);
+
+                    if (stockError) {
+                        console.error('❌ Error al reducir stock:', stockError);
+                    } else {
+                        console.log(`  ✅ Stock reducido: ${productoActual.stock_actual} → ${nuevoStock}`);
+                    }
+                }
+            }
+        }
+
         // Invalidar caché
         invalidateCache('ordenes');
+        invalidateCache('inventario');
 
         res.status(201).json({
             success: true,

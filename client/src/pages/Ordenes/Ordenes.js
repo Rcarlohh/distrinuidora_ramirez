@@ -13,10 +13,12 @@ const Ordenes = () => {
     const [filtroEstado, setFiltroEstado] = useState('');
 
     const [formData, setFormData] = useState({
-        proveedor_id: '',
+        nombre_cliente: '',
+        rfc_cliente: '',
         fecha_orden: new Date().toISOString().split('T')[0],
-        fecha_entrega: '',
-        estado: 'En Proceso',
+        metodo_pago: 'Efectivo',
+        requiere_factura: false,
+        estado: 'Completada',
         notas: ''
     });
 
@@ -46,9 +48,15 @@ const Ordenes = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
+            const detallesFiltrados = detalles.filter(d => d.material_servicio && d.cantidad > 0);
+
+            // Debug: verificar que inventario_id existe
+            console.log('📦 Detalles a enviar:', detallesFiltrados);
+            console.log('📦 Inventario IDs:', detallesFiltrados.map(d => d.inventario_id));
+
             const data = {
                 orden: formData,
-                detalles: detalles.filter(d => d.material_servicio && d.cantidad > 0)
+                detalles: detallesFiltrados
             };
 
             if (editingOrden) {
@@ -97,11 +105,12 @@ const Ordenes = () => {
         setShowModal(false);
         setEditingOrden(null);
         setFormData({
-            numero_orden: '',
-            proveedor_id: '',
+            nombre_cliente: '',
+            rfc_cliente: '',
             fecha_orden: new Date().toISOString().split('T')[0],
-            fecha_entrega: '',
-            estado: 'Pendiente',
+            metodo_pago: 'Efectivo',
+            requiere_factura: false,
+            estado: 'Completada',
             notas: ''
         });
         setDetalles([{ cantidad: 1, material_servicio: '', precio_unitario: 0 }]);
@@ -119,9 +128,9 @@ const Ordenes = () => {
         <div className="ordenes-page">
             <div className="container">
                 <div className="page-header">
-                    <h1>Órdenes de Compra</h1>
+                    <h1>💰 Ventas / Tickets</h1>
                     <button className="btn btn-primary" onClick={() => setShowModal(true)}>
-                        <FaPlus /> Nueva Orden
+                        <FaPlus /> Nueva Venta
                     </button>
                 </div>
 
@@ -139,7 +148,7 @@ const Ordenes = () => {
                         <thead>
                             <tr>
                                 <th>No. Orden</th>
-                                <th>Proveedor</th>
+                                <th>Cliente</th>
                                 <th>Fecha</th>
                                 <th>Entrega</th>
                                 <th>Estado</th>
@@ -158,7 +167,7 @@ const Ordenes = () => {
                                 filteredOrdenes.map(orden => (
                                     <tr key={orden.id}>
                                         <td><strong>{orden.numero_orden}</strong></td>
-                                        <td>{orden.proveedor}</td>
+                                        <td>{orden.nombre_cliente || orden.proveedor || '-'}</td>
                                         <td>{new Date(orden.fecha_orden).toLocaleDateString('es-MX')}</td>
                                         <td>{orden.fecha_entrega ? new Date(orden.fecha_entrega).toLocaleDateString('es-MX') : '-'}</td>
                                         <td>
@@ -201,14 +210,14 @@ const Ordenes = () => {
                 <div className="modal-overlay" onClick={closeModal}>
                     <div className="modal modal-large" onClick={(e) => e.stopPropagation()}>
                         <div className="modal-header">
-                            <h2>Nueva Orden de Compra</h2>
+                            <h2>💰 Nueva Venta / Ticket</h2>
                             <button className="btn-close" onClick={closeModal}>×</button>
                         </div>
                         <form onSubmit={handleSubmit}>
                             <div className="modal-body">
                                 <div className="form-grid">
                                     <div className="input-group">
-                                        <label>No. Orden (Automático)</label>
+                                        <label>No. Ticket (Automático)</label>
                                         <input
                                             type="text"
                                             disabled
@@ -218,71 +227,86 @@ const Ordenes = () => {
                                     </div>
 
                                     <div className="input-group">
-                                        <label>Proveedor *</label>
-                                        <select
-                                            required
-                                            value={formData.proveedor_id}
-                                            onChange={(e) => setFormData({ ...formData, proveedor_id: e.target.value })}
-                                        >
-                                            <option value="">Seleccionar...</option>
-                                            {proveedores.map(p => (
-                                                <option key={p.id} value={p.id}>{p.nombre_social}</option>
-                                            ))}
-                                        </select>
-                                    </div>
-
-                                    <div className="input-group">
-                                        <label>Fecha de Orden *</label>
+                                        <label>Fecha</label>
                                         <input
                                             type="date"
-                                            required
+                                            disabled
                                             value={formData.fecha_orden}
-                                            onChange={(e) => setFormData({ ...formData, fecha_orden: e.target.value })}
+                                            style={{ backgroundColor: '#f8f9fa', fontWeight: 'bold' }}
                                         />
+                                        <small>Fecha automática</small>
                                     </div>
 
                                     <div className="input-group">
-                                        <label>Fecha de Entrega</label>
+                                        <label>Nombre del Cliente *</label>
                                         <input
-                                            type="date"
-                                            value={formData.fecha_entrega}
-                                            onChange={(e) => setFormData({ ...formData, fecha_entrega: e.target.value })}
+                                            type="text"
+                                            required
+                                            value={formData.nombre_cliente}
+                                            onChange={(e) => setFormData({ ...formData, nombre_cliente: e.target.value })}
+                                            placeholder="Ej: Juan Pérez"
+                                            autoFocus
                                         />
                                     </div>
 
                                     <div className="input-group">
-                                        <label>Estado</label>
+                                        <label>RFC (Opcional)</label>
+                                        <input
+                                            type="text"
+                                            value={formData.rfc_cliente}
+                                            onChange={(e) => setFormData({ ...formData, rfc_cliente: e.target.value.toUpperCase() })}
+                                            placeholder="Solo si requiere factura"
+                                            maxLength="13"
+                                        />
+                                        <small>Dejar vacío si no requiere factura</small>
+                                    </div>
+
+                                    <div className="input-group">
+                                        <label>Método de Pago *</label>
                                         <select
-                                            value={formData.estado}
-                                            onChange={(e) => setFormData({ ...formData, estado: e.target.value })}
+                                            required
+                                            value={formData.metodo_pago}
+                                            onChange={(e) => setFormData({ ...formData, metodo_pago: e.target.value })}
                                         >
-                                            <option value="En Proceso">En Proceso</option>
-                                            <option value="Completada">Completada</option>
+                                            <option value="Efectivo">💵 Efectivo</option>
+                                            <option value="Tarjeta">💳 Tarjeta</option>
+                                            <option value="Transferencia">🏦 Transferencia</option>
+                                            <option value="Cheque">📝 Cheque</option>
                                         </select>
+                                    </div>
+
+                                    <div className="input-group">
+                                        <label>
+                                            <input
+                                                type="checkbox"
+                                                checked={formData.requiere_factura}
+                                                onChange={(e) => setFormData({ ...formData, requiere_factura: e.target.checked })}
+                                                style={{ marginRight: '8px' }}
+                                            />
+                                            ¿Requiere Factura?
+                                        </label>
+                                        <small>Marca si el cliente necesita factura</small>
                                     </div>
 
                                     <div className="input-group" style={{ gridColumn: '1 / -1' }}>
-                                        <label>Notas</label>
+                                        <label>Notas / Observaciones</label>
                                         <textarea
                                             value={formData.notas}
                                             onChange={(e) => setFormData({ ...formData, notas: e.target.value })}
+                                            placeholder="Notas adicionales sobre la venta..."
+                                            rows="2"
                                         />
                                     </div>
                                 </div>
 
                                 <div className="detalles-section">
                                     {/* Sección de Detalles con Selector de Inventario */}
-                                    <h3>Detalles de la Orden</h3>
+                                    <h3>🛒 Productos de la Venta</h3>
 
                                     <InventarioSelector
                                         onSelect={(item) => {
-                                            setDetalles([...detalles, {
-                                                cantidad: 1,
-                                                material_servicio: item.nombre,
-                                                precio_unitario: item.precio_unitario,
-                                                inventario_id: item.id,
-                                                codigo: item.codigo
-                                            }]);
+                                            // El InventarioSelector ya envía el objeto completo con material_servicio
+                                            setDetalles([...detalles, item]);
                                         }}
                                     />
 
@@ -336,7 +360,7 @@ const Ordenes = () => {
                                     Cancelar
                                 </button>
                                 <button type="submit" className="btn btn-primary">
-                                    Guardar Orden
+                                    💾 Guardar Venta
                                 </button>
                             </div>
                         </form>

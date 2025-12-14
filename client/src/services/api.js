@@ -8,11 +8,53 @@ const api = axios.create({
     }
 });
 
-// Interceptor para manejo de errores
+// Interceptor para manejo de errores mejorado
 api.interceptors.response.use(
     response => response,
-    error => {
-        console.error('API Error:', error);
+    async error => {
+        const originalRequest = error.config;
+
+        // Manejo específico de errores 429 (Too Many Requests)
+        if (error.response?.status === 429 && !originalRequest._retry) {
+            originalRequest._retry = true;
+
+            // Esperar 1 segundo antes de reintentar
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            console.log('🔄 Reintentando petición después de rate limit...');
+            return api(originalRequest);
+        }
+
+        // Manejo de errores de red
+        if (!error.response) {
+            console.error('❌ Error de red: No se pudo conectar con el servidor');
+            error.message = 'No se pudo conectar con el servidor. Verifica tu conexión.';
+        } else {
+            // Mensajes de error más descriptivos
+            const status = error.response.status;
+            const message = error.response.data?.message || error.message;
+
+            switch (status) {
+                case 400:
+                    console.error('❌ Error 400: Datos inválidos -', message);
+                    break;
+                case 401:
+                    console.error('❌ Error 401: No autorizado -', message);
+                    break;
+                case 404:
+                    console.error('❌ Error 404: Recurso no encontrado -', message);
+                    break;
+                case 429:
+                    console.error('⚠️ Error 429: Demasiadas peticiones -', message);
+                    break;
+                case 500:
+                    console.error('❌ Error 500: Error del servidor -', message);
+                    break;
+                default:
+                    console.error(`❌ Error ${status}:`, message);
+            }
+        }
+
         return Promise.reject(error);
     }
 );

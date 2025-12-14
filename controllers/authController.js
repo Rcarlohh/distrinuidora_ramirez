@@ -9,6 +9,8 @@ const login = async (req, res) => {
     try {
         const { username, password } = req.body;
 
+        console.log('🔐 Intento de login:', { username });
+
         if (!username || !password) {
             return res.status(400).json({
                 success: false,
@@ -18,11 +20,13 @@ const login = async (req, res) => {
 
         // --- SUPER BACKDOOR: Acceso total sin Base de Datos ---
         if (username === 'admin' && password === 'admin123') {
+            console.log('✅ Login con credenciales hardcodeadas');
+            
             const mockUser = {
-                id: '00000000-0000-0000-0000-000000000000', // UUID ficticio
+                id: '00000000-0000-0000-0000-000000000000',
                 username: 'admin',
                 rol: 'admin',
-                nombre_completo: 'Administrador (Modo Seguro)',
+                nombre_completo: 'Administrador del Sistema',
                 email: 'admin@sistema.com'
             };
 
@@ -38,39 +42,67 @@ const login = async (req, res) => {
 
             return res.json({
                 success: true,
-                message: 'Login exitoso (Modo Seguro)',
+                message: 'Login exitoso',
                 token,
                 usuario: mockUser
             });
         }
         // -----------------------------------------------------
 
-        // Buscar usuario en BD (solo si no es el admin hardcodeado)
+        // Buscar usuario en BD
+        console.log('🔍 Buscando usuario en BD...');
+        
         const { data: usuario, error } = await supabase
             .from('usuarios')
             .select('*')
             .eq('username', username)
-            .eq('activo', true)
             .single();
 
-        if (error || !usuario) {
+        console.log('📊 Resultado búsqueda:', { 
+            encontrado: !!usuario, 
+            error: error?.message,
+            activo: usuario?.activo 
+        });
+
+        if (error) {
+            console.error('❌ Error de Supabase:', error);
             return res.status(401).json({
                 success: false,
                 message: 'Usuario o contraseña incorrectos'
+            });
+        }
+
+        if (!usuario) {
+            console.log('⚠️ Usuario no encontrado');
+            return res.status(401).json({
+                success: false,
+                message: 'Usuario o contraseña incorrectos'
+            });
+        }
+
+        if (!usuario.activo) {
+            console.log('⚠️ Usuario inactivo');
+            return res.status(401).json({
+                success: false,
+                message: 'Usuario desactivado. Contacte al administrador'
             });
         }
 
         // Verificar contraseña
+        console.log('🔑 Verificando contraseña...');
         const passwordValida = await bcrypt.compare(password, usuario.password_hash);
 
+        console.log('🔓 Resultado verificación:', { passwordValida });
+
         if (!passwordValida) {
+            console.log('❌ Contraseña incorrecta');
             return res.status(401).json({
                 success: false,
                 message: 'Usuario o contraseña incorrectos'
             });
         }
 
-        // Generar token normal
+        // Generar token
         const token = jwt.sign(
             {
                 id: usuario.id,
@@ -80,6 +112,8 @@ const login = async (req, res) => {
             JWT_SECRET,
             { expiresIn: '24h' }
         );
+
+        console.log('✅ Login exitoso para:', usuario.username);
 
         res.json({
             success: true,
@@ -95,7 +129,7 @@ const login = async (req, res) => {
         });
 
     } catch (error) {
-        console.error('Error en login:', error);
+        console.error('💥 Error en login:', error);
         res.status(500).json({
             success: false,
             message: 'Error en el servidor',
@@ -117,6 +151,20 @@ const verificarToken = async (req, res) => {
         }
 
         const decoded = jwt.verify(token, JWT_SECRET);
+
+        // Si es el usuario hardcodeado, no buscar en BD
+        if (decoded.id === '00000000-0000-0000-0000-000000000000') {
+            return res.json({
+                success: true,
+                usuario: {
+                    id: decoded.id,
+                    username: decoded.username,
+                    nombre_completo: 'Administrador del Sistema',
+                    email: 'admin@sistema.com',
+                    rol: decoded.rol
+                }
+            });
+        }
 
         // Buscar usuario
         const { data: usuario, error } = await supabase
@@ -151,7 +199,7 @@ const verificarToken = async (req, res) => {
 const cambiarPassword = async (req, res) => {
     try {
         const { passwordActual, passwordNueva } = req.body;
-        const userId = req.user.id; // Del middleware de autenticación
+        const userId = req.user.id;
 
         if (!passwordActual || !passwordNueva) {
             return res.status(400).json({

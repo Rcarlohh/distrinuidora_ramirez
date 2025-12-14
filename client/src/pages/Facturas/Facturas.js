@@ -13,11 +13,14 @@ const Facturas = () => {
     const [filtroEstado, setFiltroEstado] = useState('');
 
     const [formData, setFormData] = useState({
-        proveedor_id: '',
         orden_id: '',
+        nombre_cliente: '',
+        rfc_cliente: '',
+        direccion_cliente: '',
+        telefono_cliente: '',
         fecha_factura: new Date().toISOString().split('T')[0],
         fecha_vencimiento: '',
-        estado: 'En Proceso',
+        estado: 'Completada',
         metodo_pago: '',
         notas: ''
     });
@@ -29,6 +32,53 @@ const Facturas = () => {
     useEffect(() => {
         loadData();
     }, []);
+
+    // Cargar detalles de la orden cuando se selecciona una orden
+    useEffect(() => {
+        if (formData.orden_id) {
+            loadOrdenDetalles(formData.orden_id);
+        }
+    }, [formData.orden_id]);
+
+    // Calcular fecha de vencimiento automáticamente (30 días después de la fecha de factura)
+    useEffect(() => {
+        if (formData.fecha_factura) {
+            const fechaFactura = new Date(formData.fecha_factura);
+            fechaFactura.setDate(fechaFactura.getDate() + 30);
+            const fechaVencimiento = fechaFactura.toISOString().split('T')[0];
+            setFormData(prev => ({ ...prev, fecha_vencimiento: fechaVencimiento }));
+        }
+    }, [formData.fecha_factura]);
+
+    const loadOrdenDetalles = async (ordenId) => {
+        try {
+            const res = await ordenesAPI.getById(ordenId);
+            if (res.data.success && res.data.data) {
+                const orden = res.data.data;
+
+                // Cargar datos del cliente desde la orden
+                setFormData(prev => ({
+                    ...prev,
+                    nombre_cliente: orden.nombre_cliente || '',
+                    rfc_cliente: orden.rfc_cliente || '',
+                    metodo_pago: orden.metodo_pago || ''
+                }));
+
+                // Convertir los detalles de la orden a formato de factura
+                if (orden.detalles) {
+                    const detallesOrden = orden.detalles.map(detalle => ({
+                        cantidad: detalle.cantidad,
+                        descripcion: detalle.material_servicio,
+                        precio_unitario: detalle.precio_unitario,
+                        inventario_id: detalle.inventario_id
+                    }));
+                    setDetalles(detallesOrden);
+                }
+            }
+        } catch (error) {
+            console.error('Error al cargar detalles de la orden:', error);
+        }
+    };
 
     const loadData = async () => {
         try {
@@ -95,12 +145,14 @@ const Facturas = () => {
     const closeModal = () => {
         setShowModal(false);
         setFormData({
-            numero_factura: '',
-            proveedor_id: '',
             orden_id: '',
+            nombre_cliente: '',
+            rfc_cliente: '',
+            direccion_cliente: '',
+            telefono_cliente: '',
             fecha_factura: new Date().toISOString().split('T')[0],
             fecha_vencimiento: '',
-            estado: 'Pendiente',
+            estado: 'Completada',
             metodo_pago: '',
             notas: ''
         });
@@ -139,7 +191,7 @@ const Facturas = () => {
                         <thead>
                             <tr>
                                 <th>No. Factura</th>
-                                <th>Proveedor</th>
+                                <th>Cliente</th>
                                 <th>Fecha</th>
                                 <th>Vencimiento</th>
                                 <th>Estado</th>
@@ -158,7 +210,7 @@ const Facturas = () => {
                                 filteredFacturas.map(factura => (
                                     <tr key={factura.id}>
                                         <td><strong>{factura.numero_factura}</strong></td>
-                                        <td>{factura.proveedor}</td>
+                                        <td>{factura.nombre_cliente || factura.proveedor || '-'}</td>
                                         <td>{new Date(factura.fecha_factura).toLocaleDateString('es-MX')}</td>
                                         <td>{factura.fecha_vencimiento ? new Date(factura.fecha_vencimiento).toLocaleDateString('es-MX') : '-'}</td>
                                         <td>
@@ -217,49 +269,105 @@ const Facturas = () => {
                                     </div>
 
                                     <div className="input-group">
-                                        <label>Proveedor *</label>
+                                        <label>Seleccionar Venta/Ticket *</label>
                                         <select
                                             required
-                                            value={formData.proveedor_id}
-                                            onChange={(e) => setFormData({ ...formData, proveedor_id: e.target.value })}
-                                        >
-                                            <option value="">Seleccionar...</option>
-                                            {proveedores.map(p => (
-                                                <option key={p.id} value={p.id}>{p.nombre_social}</option>
-                                            ))}
-                                        </select>
-                                    </div>
-
-                                    <div className="input-group">
-                                        <label>Orden de Compra</label>
-                                        <select
                                             value={formData.orden_id}
                                             onChange={(e) => setFormData({ ...formData, orden_id: e.target.value })}
+                                            autoFocus
                                         >
-                                            <option value="">Ninguna</option>
-                                            {ordenes.map(o => (
-                                                <option key={o.id} value={o.id}>{o.numero_orden}</option>
-                                            ))}
+                                            <option value="">Seleccionar venta...</option>
+                                            {ordenes
+                                                .sort((a, b) => new Date(b.fecha_orden) - new Date(a.fecha_orden))
+                                                .map(orden => (
+                                                    <option key={orden.id} value={orden.id}>
+                                                        {orden.numero_orden} - {orden.nombre_cliente || 'Sin nombre'} - ${parseFloat(orden.total || 0).toFixed(2)}
+                                                    </option>
+                                                ))
+                                            }
                                         </select>
+                                        <small>Selecciona la venta para facturar (ordenadas por más recientes)</small>
                                     </div>
 
                                     <div className="input-group">
-                                        <label>Fecha de Factura *</label>
+                                        <label>Cliente</label>
+                                        <input
+                                            type="text"
+                                            disabled
+                                            value={formData.nombre_cliente}
+                                            style={{ backgroundColor: '#f8f9fa', fontWeight: 'bold' }}
+                                            placeholder="Se cargará automáticamente"
+                                        />
+                                        <small>Cargado desde la venta</small>
+                                    </div>
+
+                                    <div className="input-group">
+                                        <label>RFC del Cliente</label>
+                                        <input
+                                            type="text"
+                                            disabled
+                                            value={formData.rfc_cliente}
+                                            style={{ backgroundColor: '#f8f9fa', fontWeight: 'bold' }}
+                                            placeholder="Se cargará automáticamente"
+                                        />
+                                        <small>Cargado desde la venta</small>
+                                    </div>
+
+                                    <div className="input-group" style={{ gridColumn: '1 / -1' }}>
+                                        <label>Dirección del Cliente *</label>
+                                        <input
+                                            type="text"
+                                            required
+                                            value={formData.direccion_cliente}
+                                            onChange={(e) => setFormData({ ...formData, direccion_cliente: e.target.value })}
+                                            placeholder="Ej: Calle Principal #123, Col. Centro"
+                                        />
+                                        <small>Dirección completa para la factura</small>
+                                    </div>
+
+                                    <div className="input-group">
+                                        <label>Teléfono del Cliente</label>
+                                        <input
+                                            type="text"
+                                            value={formData.telefono_cliente}
+                                            onChange={(e) => setFormData({ ...formData, telefono_cliente: e.target.value })}
+                                            placeholder="Ej: 55 1234 5678"
+                                        />
+                                        <small>Teléfono de contacto</small>
+                                    </div>
+
+                                    <div className="input-group">
+                                        <label>Fecha de Factura</label>
                                         <input
                                             type="date"
-                                            required
+                                            disabled
                                             value={formData.fecha_factura}
-                                            onChange={(e) => setFormData({ ...formData, fecha_factura: e.target.value })}
+                                            style={{ backgroundColor: '#f8f9fa' }}
                                         />
+                                        <small>Fecha automática</small>
                                     </div>
 
                                     <div className="input-group">
                                         <label>Fecha de Vencimiento</label>
                                         <input
                                             type="date"
+                                            disabled
                                             value={formData.fecha_vencimiento}
-                                            onChange={(e) => setFormData({ ...formData, fecha_vencimiento: e.target.value })}
+                                            style={{ backgroundColor: '#f8f9fa' }}
                                         />
+                                        <small>30 días automáticos</small>
+                                    </div>
+
+                                    <div className="input-group">
+                                        <label>Método de Pago</label>
+                                        <input
+                                            type="text"
+                                            disabled
+                                            value={formData.metodo_pago}
+                                            style={{ backgroundColor: '#f8f9fa' }}
+                                            placeholder="Se cargará automáticamente"
+                                        />
+                                        <small>Cargado desde la venta</small>
                                     </div>
 
                                     <div className="input-group">
@@ -273,44 +381,22 @@ const Facturas = () => {
                                         </select>
                                     </div>
 
-                                    <div className="input-group">
-                                        <label>Método de Pago</label>
-                                        <input
-                                            type="text"
-                                            value={formData.metodo_pago}
-                                            onChange={(e) => setFormData({ ...formData, metodo_pago: e.target.value })}
-                                            placeholder="Ej: Transferencia, Efectivo..."
-                                        />
-                                    </div>
-
                                     <div className="input-group" style={{ gridColumn: '1 / -1' }}>
-                                        <label>Notas</label>
+                                        <label>Notas / Observaciones</label>
                                         <textarea
                                             value={formData.notas}
                                             onChange={(e) => setFormData({ ...formData, notas: e.target.value })}
+                                            placeholder="Notas adicionales para la factura..."
+                                            rows="2"
                                         />
                                     </div>
                                 </div>
 
                                 <div className="detalles-section">
-                                    <h3>Detalles de la Factura</h3>
-
-                                    <InventarioSelector
-                                        onSelect={(item) => {
-                                            setDetalles([...detalles, {
-                                                cantidad: 1,
-                                                descripcion: item.nombre,
-                                                precio_unitario: item.precio_unitario,
-                                                inventario_id: item.id
-                                            }]);
-                                        }}
-                                    />
-
-                                    <div className="detalles-header">
-                                        <button type="button" className="btn btn-secondary" onClick={addDetalle}>
-                                            <FaPlus /> Agregar Ítem Manual
-                                        </button>
-                                    </div>
+                                    <h3>📋 Productos de la Factura</h3>
+                                    <p style={{ color: '#7f8c8d', fontSize: '14px', marginBottom: '15px' }}>
+                                        ℹ️ Los productos se cargan automáticamente desde la venta seleccionada. No es necesario agregar productos manualmente.
+                                    </p>
 
                                     {detalles.map((detalle, index) => (
                                         <div key={index} className="detalle-row">
