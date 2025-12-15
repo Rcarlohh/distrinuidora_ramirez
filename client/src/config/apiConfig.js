@@ -13,8 +13,8 @@ const getApiUrl = () => {
         return 'http://localhost:5000/api';
     }
 
-    // En producción, usa la misma IP del frontend
-    return `${window.location.protocol}//${window.location.hostname}:5000/api`;
+    // En producción, usa la URL de Render
+    return 'https://distrinuidora-ramirez.onrender.com/api';
 };
 
 export const API_URL = getApiUrl();

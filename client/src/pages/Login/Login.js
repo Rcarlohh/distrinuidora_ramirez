@@ -18,7 +18,8 @@ const Login = () => {
         setLoading(true);
 
         try {
-            const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+            const API_URL = process.env.REACT_APP_API_URL ||
+                (process.env.NODE_ENV === 'development' ? 'http://localhost:5000/api' : 'https://distrinuidora-ramirez.onrender.com/api');
             const response = await fetch(`${API_URL}/auth/login`, {
                 method: 'POST',
                 headers: {
