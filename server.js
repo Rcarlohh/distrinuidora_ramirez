@@ -126,6 +126,41 @@ app.listen(PORT, () => {
     console.log('');
     console.log('Presiona CTRL+C para detener el servidor');
     console.log('══════════════════════════════════════════════════');
+
+    // ============================================
+    // KEEP-ALIVE PARA RENDER
+    // ============================================
+    // Evita que Render apague el servidor por inactividad
+    // Hace un ping cada 14 minutos (Render apaga después de 15 min de inactividad)
+
+    if (process.env.NODE_ENV === 'production' || process.env.RENDER) {
+        const KEEP_ALIVE_INTERVAL = 14 * 60 * 1000; // 14 minutos
+        const SERVER_URL = process.env.RENDER_EXTERNAL_URL || `http://localhost:${PORT}`;
+
+        console.log('');
+        console.log('🔄 Keep-Alive activado para Render');
+        console.log(`   Ping cada 14 minutos a: ${SERVER_URL}/api/health`);
+
+        setInterval(async () => {
+            try {
+                const https = require('https');
+                const http = require('http');
+                const protocol = SERVER_URL.startsWith('https') ? https : http;
+
+                protocol.get(`${SERVER_URL}/api/health`, (res) => {
+                    if (res.statusCode === 200) {
+                        console.log(`✅ Keep-Alive ping exitoso - ${new Date().toLocaleTimeString()}`);
+                    }
+                }).on('error', (err) => {
+                    console.log(`⚠️ Keep-Alive ping falló: ${err.message}`);
+                });
+            } catch (error) {
+                console.log(`⚠️ Error en Keep-Alive: ${error.message}`);
+            }
+        }, KEEP_ALIVE_INTERVAL);
+
+        console.log('══════════════════════════════════════════════════');
+    }
 });
 
 // Manejo de cierre graceful
