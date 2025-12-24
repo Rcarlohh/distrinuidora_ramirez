@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { FaHome, FaTruck, FaFileInvoice, FaUsers, FaShoppingCart, FaTools, FaBoxes } from 'react-icons/fa';
+import { FaHome, FaTruck, FaFileInvoice, FaUsers, FaTools, FaBoxes } from 'react-icons/fa';
 import './Navbar.css';
 
 const Navbar = () => {
@@ -14,8 +14,8 @@ const Navbar = () => {
         <nav className="navbar">
             <div className="navbar-container">
                 <Link to="/" className="navbar-logo">
-                    <FaShoppingCart className="logo-icon" />
-                    <span>GESTOR DE COMPRAS</span>
+                    <img src="/img/logo.png" alt="Refaccionaria Ramírez" />
+                    <span>REFACCIONARIA RAMÍREZ</span>
                 </Link>
 
                 <ul className="navbar-menu">

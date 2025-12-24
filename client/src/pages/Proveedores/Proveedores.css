@@ -1,5 +1,6 @@
 .proveedores-page {
     padding: 40px 0;
+    min-height: calc(100vh - 80px);
 }
 
 .page-header {
@@ -11,8 +12,10 @@
 
 .page-header h1 {
     font-size: 32px;
-    color: var(--secondary);
-    font-weight: 700;
+    color: #FFFFFF;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 .search-bar {
@@ -22,64 +25,72 @@
 
 .search-bar input {
     width: 100%;
-    padding: 14px 14px 14px 45px;
-    border: 2px solid var(--border-color);
-    border-radius: var(--border-radius);
+    padding: 16px 16px 16px 50px;
+    border: 2px solid #2A2A2A;
+    border-radius: 14px;
     font-size: 16px;
-    transition: var(--transition);
+    transition: all 0.3s ease;
+    background: #1A1A1A;
+    color: #FFFFFF;
+}
+
+.search-bar input::placeholder {
+    color: #6B7280;
 }
 
 .search-bar input:focus {
     outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+    border-color: #E31C25;
+    box-shadow: 0 0 0 4px rgba(227, 28, 37, 0.2), 0 0 20px rgba(227, 28, 37, 0.1);
 }
 
 .search-icon {
     position: absolute;
-    left: 15px;
+    left: 18px;
     top: 50%;
     transform: translateY(-50%);
-    color: var(--gray-400);
-    font-size: 18px;
+    color: #6B7280;
+    font-size: 20px;
 }
 
 .action-buttons {
     display: flex;
-    gap: 8px;
+    gap: 10px;
     justify-content: center;
 }
 
 .btn-icon {
-    width: 36px;
-    height: 36px;
+    width: 40px;
+    height: 40px;
     border: none;
-    border-radius: 8px;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: var(--transition);
-    font-size: 14px;
+    transition: all 0.3s ease;
+    font-size: 16px;
 }
 
 .btn-edit {
-    background: #3498db;
+    background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
     color: white;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
 .btn-edit:hover {
-    background: #2980b9;
+    background: linear-gradient(135deg, #60A5FA 0%, #3B82F6 100%);
     transform: scale(1.1);
 }
 
 .btn-delete {
-    background: #e74c3c;
+    background: linear-gradient(135deg, #E31C25 0%, #B91520 100%);
     color: white;
+    box-shadow: 0 4px 12px rgba(227, 28, 37, 0.3);
 }
 
 .btn-delete:hover {
-    background: #c0392b;
+    background: linear-gradient(135deg, #FF3B44 0%, #E31C25 100%);
     transform: scale(1.1);
 }
 
@@ -87,14 +98,14 @@
     background: none;
     border: none;
     font-size: 32px;
-    color: var(--gray-400);
+    color: #6B7280;
     cursor: pointer;
-    transition: var(--transition);
+    transition: all 0.3s ease;
     line-height: 1;
 }
 
 .btn-close:hover {
-    color: var(--danger);
+    color: #E31C25;
 }
 
 .form-grid {
@@ -116,13 +127,5 @@
 
     .form-grid {
         grid-template-columns: 1fr;
-    }
-
-    .table-container {
-        overflow-x: auto;
-    }
-
-    table {
-        min-width: 800px;
     }
 }

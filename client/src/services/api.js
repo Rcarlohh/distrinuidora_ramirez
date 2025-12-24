@@ -87,17 +87,21 @@ export const ordenesAPI = {
 };
 
 // ============================================
-// FACTURAS
+// FACTURAS - Carga de documentos
 // ============================================
 
 export const facturasAPI = {
     getAll: (params) => api.get('/facturas', { params }),
     getById: (id) => api.get(`/facturas/${id}`),
-    create: (data) => api.post('/facturas', data),
-    update: (id, data) => api.put(`/facturas/${id}`, data),
+    create: (formData) => api.post('/facturas', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+    }),
+    update: (id, formData) => api.put(`/facturas/${id}`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+    }),
     delete: (id) => api.delete(`/facturas/${id}`),
-    downloadPDF: (id) => {
-        window.open(`${API_URL}/facturas/${id}/pdf`, '_blank');
+    download: (id) => {
+        window.open(`${API_URL}/facturas/${id}/download`, '_blank');
     }
 };
 

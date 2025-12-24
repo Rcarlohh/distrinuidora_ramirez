@@ -1,5 +1,6 @@
 .home {
     padding: 40px 0;
+    min-height: calc(100vh - 80px);
 }
 
 .home-header {
@@ -9,34 +10,35 @@
 
 .home-header h1 {
     font-size: 42px;
-    color: var(--secondary);
+    color: #FFFFFF;
     margin-bottom: 15px;
-    font-weight: 700;
+    font-weight: 800;
 }
 
 .home-header p {
     font-size: 18px;
-    color: var(--text-secondary);
+    color: #9CA3AF;
     max-width: 600px;
     margin: 0 auto;
 }
 
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 24px;
     margin-bottom: 50px;
 }
 
 .stat-card {
-    background: white;
-    border-radius: 16px;
-    padding: 30px;
+    background: linear-gradient(145deg, #1A1A1A 0%, #111111 100%);
+    border-radius: 20px;
+    padding: 28px;
     display: flex;
     align-items: center;
-    gap: 20px;
-    box-shadow: var(--shadow-md);
-    transition: var(--transition);
+    gap: 24px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    transition: all 0.4s ease;
+    border: 1px solid #2A2A2A;
     position: relative;
     overflow: hidden;
 }
@@ -46,70 +48,51 @@
     position: absolute;
     top: 0;
     left: 0;
-    width: 4px;
+    width: 5px;
     height: 100%;
-    background: currentColor;
+    background: linear-gradient(180deg, #E31C25, #B91520);
 }
 
 .stat-card:hover {
-    transform: translateY(-5px);
-    box-shadow: var(--shadow-xl);
-}
-
-.stat-primary {
-    color: var(--primary);
-}
-
-.stat-success {
-    color: var(--success);
-}
-
-.stat-info {
-    color: var(--info);
-}
-
-.stat-warning {
-    color: var(--warning);
+    transform: translateY(-8px);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 40px rgba(227, 28, 37, 0.2);
+    border-color: rgba(227, 28, 37, 0.3);
 }
 
 .stat-icon {
-    width: 70px;
-    height: 70px;
-    border-radius: 16px;
+    width: 75px;
+    height: 75px;
+    border-radius: 18px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 32px;
-    background: currentColor;
+    font-size: 34px;
+    background: linear-gradient(135deg, #E31C25 0%, #B91520 100%);
     color: white;
-    opacity: 0.9;
-}
-
-.stat-content {
-    flex: 1;
+    box-shadow: 0 10px 25px rgba(227, 28, 37, 0.3);
 }
 
 .stat-content h3 {
-    font-size: 36px;
-    font-weight: 700;
-    margin-bottom: 5px;
-    color: var(--text-primary);
+    font-size: 38px;
+    font-weight: 800;
+    margin-bottom: 6px;
+    color: #FFFFFF;
 }
 
 .stat-content p {
     font-size: 14px;
-    color: var(--text-secondary);
-    margin-bottom: 8px;
+    color: #9CA3AF;
+    margin-bottom: 10px;
 }
 
 .stat-badge {
     display: inline-block;
-    padding: 4px 12px;
-    background: rgba(231, 76, 60, 0.1);
-    color: var(--primary);
+    padding: 5px 14px;
+    background: rgba(227, 28, 37, 0.15);
+    color: #FF3B44;
     border-radius: 20px;
     font-size: 12px;
-    font-weight: 600;
+    font-weight: 700;
 }
 
 .quick-actions {
@@ -118,9 +101,10 @@
 
 .quick-actions h2 {
     font-size: 28px;
-    color: var(--secondary);
+    color: #FFFFFF;
     margin-bottom: 30px;
     text-align: center;
+    font-weight: 800;
 }
 
 .actions-grid {
@@ -130,52 +114,46 @@
 }
 
 .action-card {
-    background: white;
-    border-radius: 16px;
+    background: linear-gradient(145deg, #1A1A1A 0%, #0F0F0F 100%);
+    border-radius: 20px;
     padding: 40px 30px;
     text-align: center;
     text-decoration: none;
-    box-shadow: var(--shadow-md);
-    transition: var(--transition);
-    border: 2px solid transparent;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    transition: all 0.4s ease;
+    border: 2px solid #2A2A2A;
 }
 
 .action-card:hover {
-    transform: translateY(-8px);
-    box-shadow: var(--shadow-xl);
-    border-color: var(--primary);
+    transform: translateY(-10px);
+    border-color: #E31C25;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(227, 28, 37, 0.2);
 }
 
 .action-icon {
-    font-size: 48px;
-    color: var(--primary);
-    margin-bottom: 20px;
+    font-size: 52px;
+    color: #E31C25;
+    margin-bottom: 24px;
 }
 
 .action-card h3 {
-    font-size: 22px;
-    color: var(--text-primary);
-    margin-bottom: 10px;
+    font-size: 20px;
+    color: #FFFFFF;
+    margin-bottom: 12px;
+    font-weight: 700;
 }
 
 .action-card p {
     font-size: 14px;
-    color: var(--text-secondary);
+    color: #9CA3AF;
 }
 
 @media (max-width: 768px) {
     .home-header h1 {
-        font-size: 32px;
+        font-size: 28px;
     }
 
-    .home-header p {
-        font-size: 16px;
-    }
-
-    .stats-grid {
-        grid-template-columns: 1fr;
-    }
-
+    .stats-grid,
     .actions-grid {
         grid-template-columns: 1fr;
     }

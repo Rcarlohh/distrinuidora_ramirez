@@ -4,18 +4,20 @@
 }
 
 .section-header {
-    background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+    background: linear-gradient(135deg, #1A1A1A 0%, #0F0F0F 100%);
     color: white;
-    padding: 16px 24px;
-    border-radius: 12px;
+    padding: 18px 24px;
+    border-radius: 14px;
     margin: 30px 0 20px 0;
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 700;
     display: flex;
     align-items: center;
     gap: 12px;
     text-transform: uppercase;
     letter-spacing: 1px;
+    border-left: 4px solid #E31C25;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
 }
 
 .modal-xl {
@@ -39,5 +41,10 @@
     .modal-xl {
         max-width: 95%;
         max-height: 85vh;
+    }
+
+    .section-header {
+        font-size: 14px;
+        padding: 14px 18px;
     }
 }

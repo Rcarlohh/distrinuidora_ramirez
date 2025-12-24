@@ -52,8 +52,8 @@ const Home = () => {
         <div className="home">
             <div className="container">
                 <div className="home-header">
-                    <h1>Sistema de Gestión de Compras</h1>
-                    <p>Administra tus órdenes de compra, facturas y proveedores de manera eficiente</p>
+                    <h1>REFACCIONARIA RAMÍREZ</h1>
+                    <p>Venta y reparación de muelles y suspensiones - Sistema de Gestión</p>
                 </div>
 
                 <div className="stats-grid">

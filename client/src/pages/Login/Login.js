@@ -51,10 +51,10 @@ const Login = () => {
                 <div className="login-card">
                     <div className="login-header">
                         <div className="login-icon">
-                            <FaUser />
+                            <img src="/img/logo.png" alt="Refaccionaria Ramírez" />
                         </div>
-                        <h1>GESTOR DE COMPRAS</h1>
-                        <p>Ingrese sus credenciales</p>
+                        <h1>REFACCIONARIA RAMÍREZ</h1>
+                        <p>Sistema de Gestión</p>
                     </div>
 
                     {error && (

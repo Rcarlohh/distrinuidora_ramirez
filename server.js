@@ -57,6 +57,10 @@ app.use('/api/facturas', facturasRoutes);
 app.use('/api/ordenes-trabajo', ordenesTrabajoRoutes);
 app.use('/api/inventario', inventarioRoutes);
 
+// Servir archivos estáticos de uploads
+const path = require('path');
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 // Ruta de health check
 app.get('/api/health', (req, res) => {
     res.json({

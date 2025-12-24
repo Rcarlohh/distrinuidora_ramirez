@@ -11,12 +11,20 @@ const OrdenesTrabajo = () => {
     const [filtroEstado, setFiltroEstado] = useState('');
 
     const [formData, setFormData] = useState({
-        // Cliente
-        nombre_cliente: '',
-        direccion: '',
-        telefono: '',
+        // Operador
+        nombre_operador: '',
+        telefono_operador: '',
+        // Dueño del camión/máquina
+        nombre_dueno: '',
+        telefono_dueno: '',
+        // Ingreso
+        fecha_ingreso: '',
+        hora_ingreso: '',
+        nombre_recibe_unidad: '',
+        recibe_llaves: '',
         // Vehículo
         no_placas: '',
+        no_unidad: '',
         modelo: '',
         marca: '',
         anio: '',
@@ -108,10 +116,16 @@ const OrdenesTrabajo = () => {
         setShowModal(false);
         setFormData({
             numero_orden_trabajo: '',
-            nombre_cliente: '',
-            direccion: '',
-            telefono: '',
+            nombre_operador: '',
+            telefono_operador: '',
+            nombre_dueno: '',
+            telefono_dueno: '',
+            fecha_ingreso: '',
+            hora_ingreso: '',
+            nombre_recibe_unidad: '',
+            recibe_llaves: '',
             no_placas: '',
+            no_unidad: '',
             modelo: '',
             marca: '',
             anio: '',
@@ -128,7 +142,7 @@ const OrdenesTrabajo = () => {
             hora_entrega_unidad: '',
             recibe_unidad: '',
             observaciones: '',
-            estado: 'Pendiente'
+            estado: 'En Proceso'
         });
         setDetalles([{ cantidad: 1, material_concepto: '', precio_unitario: 0 }]);
     };
@@ -232,61 +246,37 @@ const OrdenesTrabajo = () => {
                         </div>
                         <form onSubmit={handleSubmit}>
                             <div className="modal-body">
-                                {/* Número de Orden */}
+                                {/* Información de Ingreso */}
                                 <div className="section-header">
-                                    <FaTools /> INFORMACIÓN DE LA ORDEN
+                                    <FaTools /> INFORMACIÓN DE INGRESO
                                 </div>
                                 <div className="form-grid">
                                     <div className="input-group">
-                                        <label>No. Orden de Trabajo (Automático)</label>
+                                        <label>Fecha de Ingreso *</label>
                                         <input
-                                            type="text"
-                                            disabled
-                                            placeholder="Se generará al guardar"
-                                            style={{ backgroundColor: '#f8f9fa' }}
-                                        />
-                                    </div>
-                                </div>
-
-                                {/* Información del Cliente */}
-                                <div className="section-header">
-                                    <FaUser /> INFORMACIÓN DEL CLIENTE
-                                </div>
-                                <div className="form-grid">
-                                    <div className="input-group">
-                                        <label>Nombre del Cliente *</label>
-                                        <input
-                                            type="text"
+                                            type="date"
                                             required
-                                            value={formData.nombre_cliente}
-                                            onChange={(e) => setFormData({ ...formData, nombre_cliente: e.target.value })}
+                                            value={formData.fecha_ingreso}
+                                            onChange={(e) => setFormData({ ...formData, fecha_ingreso: e.target.value })}
                                         />
                                     </div>
                                     <div className="input-group">
-                                        <label>Teléfono *</label>
+                                        <label>Hora de Ingreso *</label>
                                         <input
-                                            type="tel"
+                                            type="time"
                                             required
-                                            value={formData.telefono}
-                                            onChange={(e) => setFormData({ ...formData, telefono: e.target.value })}
+                                            value={formData.hora_ingreso}
+                                            onChange={(e) => setFormData({ ...formData, hora_ingreso: e.target.value })}
                                         />
                                     </div>
-                                    <div className="input-group" style={{ gridColumn: '1 / -1' }}>
-                                        <label>Dirección *</label>
+                                    <div className="input-group">
+                                        <label>No. Unidad</label>
                                         <input
                                             type="text"
-                                            required
-                                            value={formData.direccion}
-                                            onChange={(e) => setFormData({ ...formData, direccion: e.target.value })}
+                                            value={formData.no_unidad}
+                                            onChange={(e) => setFormData({ ...formData, no_unidad: e.target.value })}
                                         />
                                     </div>
-                                </div>
-
-                                {/* Información del Vehículo */}
-                                <div className="section-header">
-                                    <FaCar /> INFORMACIÓN DEL VEHÍCULO
-                                </div>
-                                <div className="form-grid">
                                     <div className="input-group">
                                         <label>No. Placas *</label>
                                         <input
@@ -296,48 +286,125 @@ const OrdenesTrabajo = () => {
                                             onChange={(e) => setFormData({ ...formData, no_placas: e.target.value.toUpperCase() })}
                                         />
                                     </div>
+                                </div>
+
+                                {/* Información del Operador */}
+                                <div className="section-header">
+                                    <FaUser /> NOMBRE DE OPERADOR
+                                </div>
+                                <div className="form-grid">
                                     <div className="input-group">
-                                        <label>Marca *</label>
+                                        <label>Nombre del Operador *</label>
                                         <input
                                             type="text"
                                             required
+                                            value={formData.nombre_operador}
+                                            onChange={(e) => setFormData({ ...formData, nombre_operador: e.target.value })}
+                                        />
+                                    </div>
+                                    <div className="input-group">
+                                        <label>Teléfono del Operador</label>
+                                        <input
+                                            type="tel"
+                                            value={formData.telefono_operador}
+                                            onChange={(e) => setFormData({ ...formData, telefono_operador: e.target.value })}
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Información del Dueño del Camión */}
+                                <div className="section-header">
+                                    <FaUser /> DUEÑO DEL CAMIÓN / MÁQUINA
+                                </div>
+                                <div className="form-grid">
+                                    <div className="input-group">
+                                        <label>Nombre del Dueño *</label>
+                                        <input
+                                            type="text"
+                                            required
+                                            value={formData.nombre_dueno}
+                                            onChange={(e) => setFormData({ ...formData, nombre_dueno: e.target.value })}
+                                        />
+                                    </div>
+                                    <div className="input-group">
+                                        <label>Teléfono del Dueño</label>
+                                        <input
+                                            type="tel"
+                                            value={formData.telefono_dueno}
+                                            onChange={(e) => setFormData({ ...formData, telefono_dueno: e.target.value })}
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Recibe Unidad */}
+                                <div className="section-header">
+                                    RECEPCIÓN DE UNIDAD
+                                </div>
+                                <div className="form-grid">
+                                    <div className="input-group">
+                                        <label>Nombre de Quien Recibe Unidad *</label>
+                                        <input
+                                            type="text"
+                                            required
+                                            value={formData.nombre_recibe_unidad}
+                                            onChange={(e) => setFormData({ ...formData, nombre_recibe_unidad: e.target.value })}
+                                        />
+                                    </div>
+                                    <div className="input-group">
+                                        <label>Recibe Llaves</label>
+                                        <select
+                                            value={formData.recibe_llaves}
+                                            onChange={(e) => setFormData({ ...formData, recibe_llaves: e.target.value })}
+                                        >
+                                            <option value="">Seleccionar...</option>
+                                            <option value="Sí">Sí</option>
+                                            <option value="No">No</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                {/* Información del Vehículo */}
+                                <div className="section-header">
+                                    <FaCar /> INFORMACIÓN DEL VEHÍCULO
+                                </div>
+                                <div className="form-grid">
+                                    <div className="input-group">
+                                        <label>Marca</label>
+                                        <input
+                                            type="text"
                                             value={formData.marca}
                                             onChange={(e) => setFormData({ ...formData, marca: e.target.value })}
                                         />
                                     </div>
                                     <div className="input-group">
-                                        <label>Modelo *</label>
+                                        <label>Modelo</label>
                                         <input
                                             type="text"
-                                            required
                                             value={formData.modelo}
                                             onChange={(e) => setFormData({ ...formData, modelo: e.target.value })}
                                         />
                                     </div>
                                     <div className="input-group">
-                                        <label>Año *</label>
+                                        <label>Año</label>
                                         <input
                                             type="text"
-                                            required
                                             maxLength="4"
                                             value={formData.anio}
                                             onChange={(e) => setFormData({ ...formData, anio: e.target.value })}
                                         />
                                     </div>
                                     <div className="input-group">
-                                        <label>Color *</label>
+                                        <label>Color</label>
                                         <input
                                             type="text"
-                                            required
                                             value={formData.color}
                                             onChange={(e) => setFormData({ ...formData, color: e.target.value })}
                                         />
                                     </div>
                                     <div className="input-group">
-                                        <label>Kilometraje *</label>
+                                        <label>Kilometraje</label>
                                         <input
                                             type="text"
-                                            required
                                             value={formData.kilometraje}
                                             onChange={(e) => setFormData({ ...formData, kilometraje: e.target.value })}
                                             placeholder="Ej: 50,000 km"
@@ -347,10 +414,10 @@ const OrdenesTrabajo = () => {
 
                                 {/* Descripción del Servicio */}
                                 <div className="section-header">
-                                    <FaTools /> DESCRIPCIÓN DEL SERVICIO
+                                    <FaTools /> DESCRIPCIÓN DE SERVICIO A REALIZAR
                                 </div>
                                 <div className="input-group">
-                                    <label>Descripción del Servicio a Realizar *</label>
+                                    <label>Descripción del Servicio *</label>
                                     <textarea
                                         required
                                         rows="4"
@@ -421,18 +488,18 @@ const OrdenesTrabajo = () => {
                                     ))}
 
                                     {/* Total General */}
-                                    <div style={{ marginTop: '20px', padding: '15px', backgroundColor: '#f8f9fa', borderRadius: '8px' }}>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                                    <div style={{ marginTop: '20px', padding: '15px', backgroundColor: '#1A1A1A', borderRadius: '12px', border: '1px solid #2A2A2A' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', color: '#9CA3AF' }}>
                                             <strong>Subtotal:</strong>
                                             <span>${detalles.reduce((sum, d) => sum + ((d.cantidad || 0) * (d.precio_unitario || 0)), 0).toFixed(2)}</span>
                                         </div>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', color: '#9CA3AF' }}>
                                             <strong>IVA (16%):</strong>
                                             <span>${(detalles.reduce((sum, d) => sum + ((d.cantidad || 0) * (d.precio_unitario || 0)), 0) * 0.16).toFixed(2)}</span>
                                         </div>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '18px', borderTop: '2px solid #dee2e6', paddingTop: '8px' }}>
-                                            <strong>Total:</strong>
-                                            <strong style={{ color: '#2c3e50' }}>${(detalles.reduce((sum, d) => sum + ((d.cantidad || 0) * (d.precio_unitario || 0)), 0) * 1.16).toFixed(2)}</strong>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '18px', borderTop: '2px solid #2A2A2A', paddingTop: '8px' }}>
+                                            <strong style={{ color: '#FFFFFF' }}>Total:</strong>
+                                            <strong style={{ color: '#10B981' }}>${(detalles.reduce((sum, d) => sum + ((d.cantidad || 0) * (d.precio_unitario || 0)), 0) * 1.16).toFixed(2)}</strong>
                                         </div>
                                     </div>
                                 </div>

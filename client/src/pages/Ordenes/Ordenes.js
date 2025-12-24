@@ -222,7 +222,7 @@ const Ordenes = () => {
                                             type="text"
                                             disabled
                                             placeholder="Se generará al guardar"
-                                            style={{ backgroundColor: '#f8f9fa' }}
+                                            style={{ backgroundColor: '#1A1A1A', color: '#6B7280' }}
                                         />
                                     </div>
 
@@ -232,7 +232,7 @@ const Ordenes = () => {
                                             type="date"
                                             disabled
                                             value={formData.fecha_orden}
-                                            style={{ backgroundColor: '#f8f9fa', fontWeight: 'bold' }}
+                                            style={{ backgroundColor: '#1A1A1A', fontWeight: 'bold', color: '#6B7280' }}
                                         />
                                         <small>Fecha automática</small>
                                     </div>
